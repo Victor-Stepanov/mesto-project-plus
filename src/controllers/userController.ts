@@ -4,28 +4,28 @@ import User from '../models/userModels';
 import { HttpStatusCode } from '../types/code.types';
 
 interface IUserController {
-  getUsers(): Promise<void>;
+  getUsers(req: Request, res: Response): Promise<Response>;
 
-  getUserById(): Promise<void>;
+  getUserById(req: Request, res: Response): Promise<Response>;
 
-  createUser(): Promise<void>;
+  createUser(req: Request, res: Response): Promise<Response>;
 }
 
-class UserController {
-  static async getUsers(req: Request, res: Response) {
+class UserController implements IUserController {
+  async getUsers(req: Request, res: Response) {
     try {
       const users = await User.find({});
-      res.status(HttpStatusCode.OK)
+      return res.status(HttpStatusCode.OK)
         .send(users);
     } catch (err) {
-      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
         .send({
           message: 'Ошибка на сервере',
         });
     }
   }
 
-  static async getUserById(req: Request, res: Response) {
+  async getUserById(req: Request, res: Response) {
     try {
       const { userId } = req.params;
       const user = await User.findById(userId);
@@ -45,7 +45,7 @@ class UserController {
     }
   }
 
-  static async createUser(req: Request, res: Response) {
+  async createUser(req: Request, res: Response) {
     try {
       const {
         name,
@@ -74,4 +74,4 @@ class UserController {
   }
 }
 
-export default UserController;
+export default new UserController();
