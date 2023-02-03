@@ -12,15 +12,8 @@ const {
 
 const app = express();
 app.use(json());
-app.use(routes);
-// app.use((req: IRequestCustom, res: Response, next: NextFunction) => {
-//   req.user = {
-//     _id: '5d8b8592978f8bd833ca8133',
-//   };
-//
-//   next();
-// });
 app.use(fakeId);
+app.use(routes);
 
 async function connection() {
   try {
