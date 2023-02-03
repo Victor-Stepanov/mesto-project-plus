@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import User from '../models/userModels';
 import { HttpStatusCode } from '../types/code.types';
+import { IRequestCustom } from '../types/custom.types';
 
 interface IUserController {
   getUsers(req: Request, res: Response): Promise<Response>;
@@ -9,6 +10,10 @@ interface IUserController {
   getUserById(req: Request, res: Response): Promise<Response>;
 
   createUser(req: Request, res: Response): Promise<Response>;
+
+  updateProfile(req: IRequestCustom, res: Response): Promise<Response>;
+
+  updateProfileAvatar(req: IRequestCustom, res: Response): Promise<Response>;
 }
 
 class UserController implements IUserController {
@@ -52,7 +57,7 @@ class UserController implements IUserController {
         about,
         avatar,
       } = req.body;
-      const newUser = User.create({
+      const newUser = await User.create({
         name,
         about,
         avatar,
@@ -66,6 +71,54 @@ class UserController implements IUserController {
             message: err.message,
           });
       }
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send({
+          message: 'Ошибка на сервере',
+        });
+    }
+  }
+
+  async updateProfile(req: IRequestCustom, res: Response) {
+    try {
+      const {
+        name,
+        about,
+      } = req.body;
+      const id = req?.user?._id;
+      const updateUser = await User.findByIdAndUpdate(id, {
+        name,
+        about,
+      });
+      if (!updateUser) {
+        return res.status(HttpStatusCode.NOT_FOUND)
+          .send({
+            message: 'Required user not found.',
+          });
+      }
+      return res.status(HttpStatusCode.OK)
+        .send(updateUser);
+    } catch (err) {
+      return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send({
+          message: 'Ошибка на сервере',
+        });
+    }
+  }
+
+  async updateProfileAvatar(req: IRequestCustom, res: Response) {
+    try {
+      const { avatar } = req.body;
+      const id = req.user!._id;
+      const updateUser = await User.findByIdAndUpdate(id, { avatar });
+      if (!updateUser) {
+        return res.status(HttpStatusCode.NOT_FOUND)
+          .send({
+            message: 'Required user not found.',
+          });
+      }
+      return res.status(HttpStatusCode.OK)
+        .send(updateUser);
+    } catch (err) {
       return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
         .send({
           message: 'Ошибка на сервере',

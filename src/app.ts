@@ -3,6 +3,7 @@ import express, { json } from 'express';
 import mongoose from 'mongoose';
 import * as process from 'process';
 import routes from './routes ';
+import { fakeId } from './tmp';
 
 const {
   PORT = 3001,
@@ -12,6 +13,14 @@ const {
 const app = express();
 app.use(json());
 app.use(routes);
+// app.use((req: IRequestCustom, res: Response, next: NextFunction) => {
+//   req.user = {
+//     _id: '5d8b8592978f8bd833ca8133',
+//   };
+//
+//   next();
+// });
+app.use(fakeId);
 
 async function connection() {
   try {

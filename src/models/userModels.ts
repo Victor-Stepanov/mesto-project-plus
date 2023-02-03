@@ -19,7 +19,7 @@ const userSchema = new Schema<IUser>({
   avatar: {
     type: String,
     required: [true, 'The avatar field is required '],
-    default: '',
+    default: 'https://arte1.ru/images/detailed/4/23608.jpg',
   },
 }, {
   versionKey: false,
