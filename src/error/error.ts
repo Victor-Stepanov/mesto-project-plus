@@ -7,14 +7,18 @@ class RequestError extends Error {
     super(message);
     this.code = code;
   }
-
-  internalServerError(message: string) {
-    return new RequestError(HttpStatusCode.INTERNAL_SERVER_ERROR, message);
-  }
-
-  notFoundError(message: string) {
-    return new RequestError(HttpStatusCode.NOT_FOUND, message);
-  }
 }
 
-export default RequestError;
+function internalServerError(message: string) {
+  return new RequestError(HttpStatusCode.INTERNAL_SERVER_ERROR, message);
+}
+
+function notFoundError(message: string) {
+  return new RequestError(HttpStatusCode.NOT_FOUND, message);
+}
+
+function badRequest(message: string) {
+  return new RequestError(HttpStatusCode.BAD_REQUEST, message);
+}
+
+export { internalServerError, notFoundError, badRequest };
