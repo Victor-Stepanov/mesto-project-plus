@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { IRequestCustom } from '../types/custom.types';
+import { ObjectId } from 'mongoose';
+import { HttpStatusCode, IRequestCustom } from '../types';
 import Card from '../models/cardModels';
-import { HttpStatusCode } from '../types/code.types';
-import { badRequest, forBidden, internalServerError, notFoundError, } from '../error/error';
+import {
+  badRequest, forBidden, internalServerError, notFoundError,
+} from '../error/error';
 
 interface ICardController {
   getCards(req: Request, res: Response, next: NextFunction): Promise<void | Response>;
@@ -67,7 +69,7 @@ class CardController implements ICardController {
   async dislikeCard(req: IRequestCustom, res: Response, next: NextFunction):
     Promise<void | Response> {
     try {
-      const id = req.user?._id;
+      const id = req.user?._id as ObjectId;
       const { cardId } = req.params;
       const card = await Card.findByIdAndUpdate(
         cardId,

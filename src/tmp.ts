@@ -1,5 +1,5 @@
 import { NextFunction, Response } from 'express';
-import { IRequestCustom } from './types/custom.types';
+import { IRequestCustom } from './types';
 
 export const fakeId = (req: IRequestCustom, res: Response, next: NextFunction) => {
   req.user = {

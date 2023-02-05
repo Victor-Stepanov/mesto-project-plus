@@ -1,4 +1,4 @@
-import { HttpStatusCode } from '../types/code.types';
+import { HttpStatusCode } from '../types';
 
 class RequestError extends Error {
   code: HttpStatusCode;
@@ -25,4 +25,9 @@ function forBidden(message: string) {
   return new RequestError(HttpStatusCode.FORBIDDEN, message);
 }
 
-export { internalServerError, notFoundError, badRequest, forBidden };
+export {
+  internalServerError,
+  notFoundError,
+  badRequest,
+  forBidden,
+};
