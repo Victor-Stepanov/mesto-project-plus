@@ -23,7 +23,7 @@ class UserController implements IUserController {
       const users = await User.find({});
       return res.status(HttpStatusCode.OK)
         .send(users);
-    } catch (err) {
+    } catch {
       return next(internalServerError('Server error'));
     }
   }
