@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import User from '../models/userModels';
-import { HttpStatusCode } from '../types/code.types';
-import { IRequestCustom } from '../types/custom.types';
+import { HttpStatusCode, IRequestCustom } from '../types';
 import { badRequest, internalServerError, notFoundError } from '../error/error';
 
 interface IUserController {
@@ -23,7 +22,7 @@ class UserController implements IUserController {
       const users = await User.find({});
       return res.status(HttpStatusCode.OK)
         .send(users);
-    } catch (err) {
+    } catch {
       return next(internalServerError('Server error'));
     }
   }
