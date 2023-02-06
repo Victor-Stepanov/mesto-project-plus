@@ -1,7 +1,9 @@
 import './env';
 import express, { json } from 'express';
+import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import * as process from 'process';
+import helmet from 'helmet';
 import routes from './routes ';
 import { fakeId } from './tmp';
 
@@ -10,8 +12,17 @@ const {
   MONGO_URL = 'none',
 } = process.env;
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const app = express();
+app.use(helmet());
 app.use(json());
+app.use(limiter);
 app.use(fakeId);
 app.use(routes);
 
