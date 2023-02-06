@@ -1,3 +1,4 @@
+import validator from 'validator';
 import { model, Schema } from 'mongoose';
 import { IUser } from '../types';
 
@@ -8,6 +9,10 @@ const userSchema = new Schema<IUser>({
     minlength: 2,
     maxlength: 30,
     default: 'Жак-Ив Кусто',
+    validate: {
+      validator: (v: string) => v.length > 2 && v.length < 30,
+      message: 'Text should not be less than 2 characters long or more than 30 characters long.',
+    },
   },
   about: {
     type: String,
@@ -15,11 +20,19 @@ const userSchema = new Schema<IUser>({
     minlength: 2,
     maxlength: 200,
     default: 'Исследователь',
+    validate: {
+      validator: (v: string) => v.length > 2 && v.length < 200,
+      message: 'Text should not be less than 2 characters long or more than 200 characters long.',
+    },
   },
   avatar: {
     type: String,
     required: [true, 'The avatar field is required '],
     default: 'https://arte1.ru/images/detailed/4/23608.jpg',
+    validate: {
+      validator: (v: string) => validator.isURL(v),
+      message: 'Invalid URL',
+    },
   },
 }, {
   versionKey: false,

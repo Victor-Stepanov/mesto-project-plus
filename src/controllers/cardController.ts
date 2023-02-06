@@ -5,6 +5,7 @@ import Card from '../models/cardModels';
 import {
   badRequest, forBidden, internalServerError, notFoundError,
 } from '../error/error';
+import { OPTS } from '../const';
 
 interface ICardController {
   getCards(req: Request, res: Response, next: NextFunction): Promise<void | Response>;
@@ -74,7 +75,7 @@ class CardController implements ICardController {
       const card = await Card.findByIdAndUpdate(
         cardId,
         { $pull: { likes: id } },
-        { new: true },
+        OPTS,
       );
       if (!card) {
         return next(notFoundError('Required card not found.'));
@@ -106,7 +107,7 @@ class CardController implements ICardController {
       const card = await Card.findByIdAndUpdate(
         cardId,
         { $addToSet: { likes: id } },
-        { new: true },
+        OPTS,
       );
       if (!card) {
         return next(notFoundError('Required card not found.'));

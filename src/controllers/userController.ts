@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import User from '../models/userModels';
 import { HttpStatusCode, IRequestCustom } from '../types';
 import { badRequest, internalServerError, notFoundError } from '../error/error';
+import { OPTS } from '../const';
 
 interface IUserController {
   getUsers(req: Request, res: Response, next: NextFunction): Promise<void | Response>;
@@ -76,7 +77,7 @@ class UserController implements IUserController {
       const updateUser = await User.findByIdAndUpdate(id, {
         name,
         about,
-      });
+      }, OPTS);
       if (!updateUser) {
         return next(notFoundError('Required user not found.'));
       }
@@ -94,7 +95,7 @@ class UserController implements IUserController {
     try {
       const { avatar } = req.body;
       const id = req.user!._id;
-      const updateUser = await User.findByIdAndUpdate(id, { avatar });
+      const updateUser = await User.findByIdAndUpdate(id, { avatar }, OPTS);
       if (!updateUser) {
         return next(notFoundError('Required user not found.'));
       }
