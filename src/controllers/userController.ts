@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import User from '../models/userModels';
 import { HttpStatusCode, IRequestCustom } from '../types';
 import { badRequest, internalServerError, notFoundError } from '../error/error';
-import { OPTS } from '../const';
+import UserService from '../service/userService';
 
 interface IUserController {
   getUsers(req: Request, res: Response, next: NextFunction): Promise<void | Response>;
@@ -20,7 +19,7 @@ interface IUserController {
 class UserController implements IUserController {
   async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
-      const users = await User.find({});
+      const users = await UserService.getUsers();
       return res.status(HttpStatusCode.OK)
         .send(users);
     } catch {
@@ -31,7 +30,7 @@ class UserController implements IUserController {
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
       const { userId } = req.params;
-      const user = await User.findById(userId);
+      const user = await UserService.getUserById(userId);
       if (!user) {
         return next(notFoundError('Required user not found.'));
       }
@@ -47,16 +46,7 @@ class UserController implements IUserController {
 
   async createUser(req: Request, res: Response, next: NextFunction) {
     try {
-      const {
-        name,
-        about,
-        avatar,
-      } = req.body;
-      const newUser = await User.create({
-        name,
-        about,
-        avatar,
-      });
+      const newUser = await UserService.createUser(req.body);
       return res.status(HttpStatusCode.CREATED)
         .send(newUser);
     } catch (err) {
@@ -69,15 +59,7 @@ class UserController implements IUserController {
 
   async updateProfile(req: IRequestCustom, res: Response, next: NextFunction) {
     try {
-      const {
-        name,
-        about,
-      } = req.body;
-      const id = req?.user?._id;
-      const updateUser = await User.findByIdAndUpdate(id, {
-        name,
-        about,
-      }, OPTS);
+      const updateUser = await UserService.updateProfile(req);
       if (!updateUser) {
         return next(notFoundError('Required user not found.'));
       }
@@ -93,9 +75,7 @@ class UserController implements IUserController {
 
   async updateProfileAvatar(req: IRequestCustom, res: Response, next: NextFunction) {
     try {
-      const { avatar } = req.body;
-      const id = req.user!._id;
-      const updateUser = await User.findByIdAndUpdate(id, { avatar }, OPTS);
+      const updateUser = await UserService.updateProfileAvatar(req);
       if (!updateUser) {
         return next(notFoundError('Required user not found.'));
       }

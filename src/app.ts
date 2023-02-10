@@ -24,7 +24,7 @@ app.use(helmet());
 app.use(json());
 app.use(limiter);
 app.use(fakeId);
-app.use(routes);
+app.use('/api', routes);
 
 async function connection() {
   try {
