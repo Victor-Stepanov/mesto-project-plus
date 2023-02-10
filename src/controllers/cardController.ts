@@ -1,11 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { ObjectId } from 'mongoose';
 import { HttpStatusCode, IRequestCustom } from '../types';
-import Card from '../models/cardModels';
 import {
   badRequest, forBidden, internalServerError, notFoundError,
 } from '../error/error';
-import { OPTS } from '../const';
+import CardsService from '../service/cardsService';
 
 interface ICardController {
   getCards(req: Request, res: Response, next: NextFunction): Promise<void | Response>;
@@ -24,16 +22,7 @@ class CardController implements ICardController {
   async createCard(req: IRequestCustom, res: Response, next: NextFunction):
     Promise<void | Response> {
     try {
-      const id = req.user?._id;
-      const {
-        name,
-        link,
-      } = req.body;
-      const newCard = await Card.create({
-        name,
-        link,
-        owner: id,
-      });
+      const newCard = await CardsService.createCard(req);
       return res.status(HttpStatusCode.CREATED)
         .send(newCard);
     } catch (err) {
@@ -47,8 +36,7 @@ class CardController implements ICardController {
   async deleteCardById(req: IRequestCustom, res: Response, next: NextFunction):
     Promise<void | Response> {
     try {
-      const { cardId } = req.params;
-      const card = await Card.findByIdAndDelete(cardId);
+      const card = await CardsService.deleteCardById(req);
       if (!card) {
         return next(notFoundError('Required card not found.'));
       }
@@ -70,13 +58,7 @@ class CardController implements ICardController {
   async dislikeCard(req: IRequestCustom, res: Response, next: NextFunction):
     Promise<void | Response> {
     try {
-      const id = req.user?._id as ObjectId;
-      const { cardId } = req.params;
-      const card = await Card.findByIdAndUpdate(
-        cardId,
-        { $pull: { likes: id } },
-        OPTS,
-      );
+      const card = await CardsService.dislikeCard(req);
       if (!card) {
         return next(notFoundError('Required card not found.'));
       }
@@ -92,7 +74,7 @@ class CardController implements ICardController {
 
   async getCards(req: Request, res: Response, next: NextFunction): Promise<void | Response> {
     try {
-      const cards = await Card.find({});
+      const cards = await CardsService.getCards();
       return res.status(HttpStatusCode.OK)
         .send(cards);
     } catch {
@@ -102,13 +84,7 @@ class CardController implements ICardController {
 
   async likeCard(req: IRequestCustom, res: Response, next: NextFunction): Promise<void | Response> {
     try {
-      const id = req.user?._id;
-      const { cardId } = req.params;
-      const card = await Card.findByIdAndUpdate(
-        cardId,
-        { $addToSet: { likes: id } },
-        OPTS,
-      );
+      const card = await CardsService.likeCard(req);
       if (!card) {
         return next(notFoundError('Required card not found.'));
       }
