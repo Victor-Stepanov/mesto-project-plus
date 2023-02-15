@@ -1,8 +1,12 @@
 import User from '../models/userModels';
 import { IRequestCustom } from '../types';
-import { OPTS } from '../const';
+import { OPTS } from '../utils/const';
 
 class UserService {
+  checkUser(email: string) {
+    return User.findOne({ email });
+  }
+
   getUsers() {
     return User.find({});
   }
@@ -11,8 +15,10 @@ class UserService {
     return User.findById(id);
   }
 
-  createUser(data: IRequestCustom) {
-    return User.create({ ...data });
+  createUser(data: Record<string, string>) {
+    return User.create({
+      ...data,
+    });
   }
 
   updateProfile(data: IRequestCustom) {
@@ -31,6 +37,10 @@ class UserService {
     const id = data.user?._id;
     const { avatar } = data.body;
     return User.findByIdAndUpdate(id, { avatar }, OPTS);
+  }
+
+  login(email: string, password: string) {
+    return User.findUserByCredentials(email, password);
   }
 }
 

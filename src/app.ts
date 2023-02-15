@@ -4,8 +4,9 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import * as process from 'process';
 import helmet from 'helmet';
+import auth from './middlewares/auth';
 import routes from './routes ';
-import { fakeId } from './tmp';
+import UserController from './controllers/userController';
 
 const {
   PORT = 3001,
@@ -23,7 +24,10 @@ const app = express();
 app.use(helmet());
 app.use(json());
 app.use(limiter);
-app.use(fakeId);
+app.post('/signup', UserController.createUser);
+app.post('/signin', UserController.login);
+
+app.use(auth);
 app.use('/api', routes);
 
 async function connection() {

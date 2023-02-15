@@ -25,9 +25,14 @@ function forBidden(message: string) {
   return new RequestError(HttpStatusCode.FORBIDDEN, message);
 }
 
+function conflict(message: string) {
+  return new RequestError(HttpStatusCode.CONFLICT, message);
+}
+
 export {
   internalServerError,
   notFoundError,
   badRequest,
   forBidden,
+  conflict,
 };

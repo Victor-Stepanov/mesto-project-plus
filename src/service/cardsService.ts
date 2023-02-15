@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongoose';
 import Card from '../models/cardModels';
 import { IRequestCustom } from '../types';
-import { OPTS } from '../const';
+import { OPTS } from '../utils/const';
 
 class CardsService {
   getCards() {
