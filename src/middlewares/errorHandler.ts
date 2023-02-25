@@ -9,7 +9,7 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   res.status(statusCode)
     .send({
       message: statusCode === HttpStatusCode.INTERNAL_SERVER_ERROR
-        ? 'Server error'
+        ? 'На сервере произошла ошибка.'
         : message,
     });
   next();

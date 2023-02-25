@@ -25,7 +25,7 @@ class CardController implements ICardController {
         .send(newCard);
     } catch (err) {
       if (err instanceof Error && err.name === 'ValidationError') {
-        return next(badRequest('Incorrect data was submitted.'));
+        return next(badRequest('Переданы некорректные данные при создании карточки.'));
       }
       return next(err);
     }
@@ -36,18 +36,18 @@ class CardController implements ICardController {
     try {
       const card = await CardsService.deleteCardById(req);
       if (!card) {
-        return next(notFoundError('Required card not found.'));
+        return next(notFoundError('Карточка с указанным _id не найдена.'));
       }
       if (card.owner.toString() !== req.user?._id) {
-        return next(forBidden('Do not delete the cards of others.'));
+        return next(forBidden('Запрещено удалять чужие карточки.'));
       }
       return res.status(HttpStatusCode.OK)
         .send({
-          message: 'Required card removed with success.',
+          message: 'Карточка успешно удалена.',
         });
     } catch (err) {
       if (err instanceof Error && err.name === 'CastError') {
-        return next(badRequest('Incorrect id was submitted.'));
+        return next(badRequest('Передан некорректный _id карточки.'));
       }
       return next(err);
     }
@@ -58,13 +58,13 @@ class CardController implements ICardController {
     try {
       const card = await CardsService.dislikeCard(req);
       if (!card) {
-        return next(notFoundError('Required card not found.'));
+        return next(notFoundError('Переданы некорректные данные для постановки/снятии лайка.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(card);
     } catch (err) {
       if (err instanceof Error && err.name === 'CastError') {
-        return next(badRequest('Incorrect id was submitted.'));
+        return next(badRequest('Передан некорректный _id карточки.'));
       }
       return next(err);
     }
@@ -84,13 +84,13 @@ class CardController implements ICardController {
     try {
       const card = await CardsService.likeCard(req);
       if (!card) {
-        return next(notFoundError('Required card not found.'));
+        return next(notFoundError('Переданы некорректные данные для постановки/снятии лайка.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(card);
     } catch (err) {
       if (err instanceof Error && err.name === 'CastError') {
-        return next(badRequest('Incorrect id was submitted.'));
+        return next(badRequest('Передан некорректный _id карточки.'));
       }
       return next(err);
     }
