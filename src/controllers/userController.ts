@@ -31,7 +31,7 @@ class UserController implements IUserController {
       const id = req.user?._id as string;
       const currentUser = await UserService.getUserById(id);
       if (!currentUser) {
-        return next(unAuthorized('Required user not found.'));
+        return next(unAuthorized('Пользователь по указанному _id не найден.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(currentUser);
@@ -55,13 +55,13 @@ class UserController implements IUserController {
       const { userId } = req.params;
       const user = await UserService.getUserById(userId);
       if (!user) {
-        return next(unAuthorized('Required user not found.'));
+        return next(unAuthorized('Пользователь по указанному _id не найден.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(user);
     } catch (err) {
       if (err instanceof Error && err.name === 'CastError') {
-        return next(badRequest('Incorrect id was submitted.'));
+        return next(badRequest('Передан некорректный _id пользователя.'));
       }
       return next(err);
     }
@@ -76,12 +76,12 @@ class UserController implements IUserController {
       password,
     } = req.body;
     if (!email || !password) {
-      return next(badRequest('No emails or passwords submitted.'));
+      return next(badRequest('Переданы некорректные данные при создании пользователя.'));
     }
     try {
       const user = await UserService.checkUser(email);
       if (user) {
-        return next(conflict('This user already exists.'));
+        return next(conflict('Пользователь с переданным email уже существует.'));
       }
       const hashPassword = await bcrypt.hash(password, 10);
       const newUser = await UserService.createUser({
@@ -95,10 +95,10 @@ class UserController implements IUserController {
         return res.status(HttpStatusCode.CREATED)
           .send(newUser);
       }
-      return next(badRequest('Something wrong...'));
+      return next(badRequest('Переданы некорректные данные...'));
     } catch (err) {
       if (err instanceof Error && err.name === 'ValidationError') {
-        return next(badRequest('Incorrect data was submitted.'));
+        return next(badRequest('Переданы некорректные данные при создании пользователя.'));
       }
       return next(err);
     }
@@ -108,13 +108,13 @@ class UserController implements IUserController {
     try {
       const updateUser = await UserService.updateProfile(req);
       if (!updateUser) {
-        return next(unAuthorized('Required user not found.'));
+        return next(unAuthorized('Пользователь по указанному _id не найден.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(updateUser);
     } catch (err) {
       if (err instanceof Error && err.name === 'ValidationError') {
-        return next(badRequest('Incorrect data was submitted.'));
+        return next(badRequest('Переданы некорректные данные при обновлении профиля.'));
       }
       return next(err);
     }
@@ -124,13 +124,13 @@ class UserController implements IUserController {
     try {
       const updateUser = await UserService.updateProfileAvatar(req);
       if (!updateUser) {
-        return next(unAuthorized('Required user not found.'));
+        return next(unAuthorized('Пользователь по указанному _id не найден.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(updateUser);
     } catch (err) {
       if (err instanceof Error && err.name === 'ValidationError') {
-        return next(badRequest('Incorrect data was submitted.'));
+        return next(badRequest('Переданы некорректные данные при обновлении аватара.'));
       }
       return next(err);
     }
@@ -142,12 +142,12 @@ class UserController implements IUserController {
       password,
     } = req.body;
     if (!email || !password) {
-      return next(badRequest('No emails or passwords submitted.'));
+      return next(badRequest('Пользователь по указанным данным не найден.'));
     }
     try {
       const user = await UserService.login(email, password);
       if (!user) {
-        return next(notFoundError('Required user not found.'));
+        return next(notFoundError('Пользователь по указанному _id не найден'));
       }
       const token = generateToken({
         _id: user._id as string,
@@ -155,7 +155,7 @@ class UserController implements IUserController {
       return res.send({ token });
     } catch (err) {
       if (err instanceof Error && err.name === 'ValidationError') {
-        return next(badRequest('Incorrect data was submitted.'));
+        return next(badRequest('Переданы некорректные данные при авторизации пользователя.'));
       }
       return next(err);
     }
