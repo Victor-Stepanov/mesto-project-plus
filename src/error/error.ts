@@ -25,9 +25,19 @@ function forBidden(message: string) {
   return new RequestError(HttpStatusCode.FORBIDDEN, message);
 }
 
+function conflict(message: string) {
+  return new RequestError(HttpStatusCode.CONFLICT, message);
+}
+
+function unAuthorized(message: string) {
+  return new RequestError(HttpStatusCode.UNAUTHORIZED, message);
+}
+
 export {
   internalServerError,
   notFoundError,
   badRequest,
   forBidden,
+  conflict,
+  unAuthorized,
 };
