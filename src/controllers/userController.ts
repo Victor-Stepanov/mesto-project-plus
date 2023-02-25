@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { HttpStatusCode, IRequestCustom } from '../types';
-import { badRequest, internalServerError, notFoundError, conflict } from '../error/error';
+import {
+  badRequest, conflict, notFoundError, unAuthorized,
+} from '../error/error';
 import UserService from '../service/userService';
 import { generateToken } from '../utils/jwt';
 
@@ -29,12 +31,12 @@ class UserController implements IUserController {
       const id = req.user?._id as string;
       const currentUser = await UserService.getUserById(id);
       if (!currentUser) {
-        return next(notFoundError('Required user not found.'));
+        return next(unAuthorized('Required user not found.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(currentUser);
     } catch (err) {
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -43,8 +45,8 @@ class UserController implements IUserController {
       const users = await UserService.getUsers();
       return res.status(HttpStatusCode.OK)
         .send(users);
-    } catch {
-      return next(internalServerError('Server error'));
+    } catch (err) {
+      return next(err);
     }
   }
 
@@ -53,7 +55,7 @@ class UserController implements IUserController {
       const { userId } = req.params;
       const user = await UserService.getUserById(userId);
       if (!user) {
-        return next(notFoundError('Required user not found.'));
+        return next(unAuthorized('Required user not found.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(user);
@@ -61,7 +63,7 @@ class UserController implements IUserController {
       if (err instanceof Error && err.name === 'CastError') {
         return next(badRequest('Incorrect id was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -77,8 +79,8 @@ class UserController implements IUserController {
       return next(badRequest('No emails or passwords submitted.'));
     }
     try {
-      const isUser = await UserService.checkUser(email);
-      if (isUser) {
+      const user = await UserService.checkUser(email);
+      if (user) {
         return next(conflict('This user already exists.'));
       }
       const hashPassword = await bcrypt.hash(password, 10);
@@ -98,7 +100,7 @@ class UserController implements IUserController {
       if (err instanceof Error && err.name === 'ValidationError') {
         return next(badRequest('Incorrect data was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -106,7 +108,7 @@ class UserController implements IUserController {
     try {
       const updateUser = await UserService.updateProfile(req);
       if (!updateUser) {
-        return next(notFoundError('Required user not found.'));
+        return next(unAuthorized('Required user not found.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(updateUser);
@@ -114,7 +116,7 @@ class UserController implements IUserController {
       if (err instanceof Error && err.name === 'ValidationError') {
         return next(badRequest('Incorrect data was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -122,7 +124,7 @@ class UserController implements IUserController {
     try {
       const updateUser = await UserService.updateProfileAvatar(req);
       if (!updateUser) {
-        return next(notFoundError('Required user not found.'));
+        return next(unAuthorized('Required user not found.'));
       }
       return res.status(HttpStatusCode.OK)
         .send(updateUser);
@@ -130,7 +132,7 @@ class UserController implements IUserController {
       if (err instanceof Error && err.name === 'ValidationError') {
         return next(badRequest('Incorrect data was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -155,7 +157,7 @@ class UserController implements IUserController {
       if (err instanceof Error && err.name === 'ValidationError') {
         return next(badRequest('Incorrect data was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 }

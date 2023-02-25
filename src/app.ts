@@ -4,9 +4,13 @@ import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import * as process from 'process';
 import helmet from 'helmet';
+import { errors } from 'celebrate';
 import auth from './middlewares/auth';
 import routes from './routes ';
 import UserController from './controllers/userController';
+import { errorLogger, requestLogger } from './middlewares/logger';
+import { createUserValidation, loginValidation } from './validation/userValidation';
+import { errorHandler } from './middlewares/errorHandler';
 
 const {
   PORT = 3001,
@@ -23,12 +27,15 @@ const limiter = rateLimit({
 const app = express();
 app.use(helmet());
 app.use(json());
+app.use(requestLogger);
 app.use(limiter);
-app.post('/signup', UserController.createUser);
-app.post('/signin', UserController.login);
+app.post('/signup', createUserValidation, UserController.createUser);
+app.post('/signin', loginValidation, UserController.login);
 
-app.use(auth);
-app.use('/api', routes);
+app.use('/api', auth, routes);
+app.use(errorLogger);
+app.use(errors());
+app.use(errorHandler);
 
 async function connection() {
   try {

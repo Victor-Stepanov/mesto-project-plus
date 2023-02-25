@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpStatusCode, IRequestCustom } from '../types';
-import {
-  badRequest, forBidden, internalServerError, notFoundError,
-} from '../error/error';
+import { badRequest, forBidden, notFoundError } from '../error/error';
 import CardsService from '../service/cardsService';
 
 interface ICardController {
@@ -26,10 +24,10 @@ class CardController implements ICardController {
       return res.status(HttpStatusCode.CREATED)
         .send(newCard);
     } catch (err) {
-      if (err) {
+      if (err instanceof Error && err.name === 'ValidationError') {
         return next(badRequest('Incorrect data was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -51,7 +49,7 @@ class CardController implements ICardController {
       if (err instanceof Error && err.name === 'CastError') {
         return next(badRequest('Incorrect id was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -68,7 +66,7 @@ class CardController implements ICardController {
       if (err instanceof Error && err.name === 'CastError') {
         return next(badRequest('Incorrect id was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 
@@ -77,8 +75,8 @@ class CardController implements ICardController {
       const cards = await CardsService.getCards();
       return res.status(HttpStatusCode.OK)
         .send(cards);
-    } catch {
-      return next(internalServerError('Server error'));
+    } catch (err) {
+      return next(err);
     }
   }
 
@@ -94,7 +92,7 @@ class CardController implements ICardController {
       if (err instanceof Error && err.name === 'CastError') {
         return next(badRequest('Incorrect id was submitted.'));
       }
-      return next(internalServerError('Server error'));
+      return next(err);
     }
   }
 }

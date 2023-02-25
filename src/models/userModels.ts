@@ -36,6 +36,10 @@ const userSchema = new Schema<IUser, IUserModal>({
     type: String,
     required: [true, 'The email field is required '],
     unique: true,
+    validate: {
+      validator: (v: string) => validator.isEmail(v),
+      message: 'Invalid email',
+    },
   },
   password: {
     type: String,
@@ -51,11 +55,11 @@ userSchema.static('findUserByCredentials', async function findUserByCredentials(
   const user = await this.findOne({ email })
     .select('+password');
   if (!user) {
-    return Promise.reject(new Error('Неправильные почта или пароль'));
+    return Promise.reject(new Error('Incorrect email or password.'));
   }
-  const matched = bcrypt.compare(password, user.password);
+  const matched = await bcrypt.compare(password, user.password);
   if (!matched) {
-    return Promise.reject(new Error('Неправильные почта или пароль'));
+    return Promise.reject(new Error('Incorrect email or password.'));
   }
   return user;
 });

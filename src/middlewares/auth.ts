@@ -7,6 +7,7 @@ interface ISessionRequest extends Request {
 }
 
 const extractBearerToken = (token: string) => token.replace('Bearer ', '');
+// eslint-disable-next-line consistent-return
 export default (req: ISessionRequest, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
 
